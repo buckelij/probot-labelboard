@@ -4,7 +4,7 @@ test('that we can run tests', () => {
 
 const {createRobot} = require('probot')
 const app = require('probot-labelboard')
-const payload = { "event": "issues", "payload": require('./fixtures/issue.labeled.json')}
+const payload = { 'event': 'issues', 'payload': require('./fixtures/issue.labeled.json')}
 
 describe('probot-labelboard', () => {
   let robot
@@ -19,16 +19,16 @@ describe('probot-labelboard', () => {
     github = {
       repos: {
         getContent: jest.fn().mockReturnValue(Promise.resolve({
-          data: { "content": Buffer('bug:\n  repo:\n    tickets: todo').toString('base64')}
+          data: { 'content': Buffer('bug:\n  repo:\n    tickets: todo').toString('base64')}
         }))
       },
       projects: {
         getRepoProjects: jest.fn().mockReturnValue(Promise.resolve({
           // Whatever the GitHub API should return
-          data: [ {"id": 116, "name": "tickets"}, {"id": 117, "name": "meh"} ] 
+          data: [ {'id': 116, 'name': 'tickets'}, {'id': 117, 'name': 'meh'} ]
         })),
         getProjectColumns: jest.fn().mockReturnValue(Promise.resolve({
-          data: [ {"id": 331, "name": "todo"}, {"id": 332, "name": "done"}]
+          data: [ {'id': 331, 'name': 'todo'}, {'id': 332, 'name': 'done'}]
         })),
         createProjectCard: jest.fn().mockReturnValue(Promise.resolve({
 
