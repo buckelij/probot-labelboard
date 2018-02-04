@@ -11,7 +11,12 @@
 npm install
 
 # Set environment variables
-see https://probot.github.io/docs/deployment/#deploy-the-app
+# https://probot.github.io/docs/deployment/#deploy-the-app
+APP_ID=X
+WEBHOOK_SECRET=XXX
+GHE_HOST=xxx.io
+PRIVATE_KEY="$(cat ~/probot-labelboard.2018-01-01.private-key.pem)"
+
 
 # Run the bot
 npm start
