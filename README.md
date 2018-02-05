@@ -33,9 +33,9 @@ bug:
   repo:
     new tickets: todo
     help: todo
+```
 
 That will add issues labeled with 'bug' to the 'todo'
 columns of the 'new tickets' and 'help' repository projects.
-```
 
 See [docs/deploy.md](docs/deploy.md) if you would like to run your own instance of this app.
