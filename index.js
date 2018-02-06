@@ -62,7 +62,7 @@ module.exports = (robot) => {
           resolve(safeGet(['data', 'repositoryOwner', 'repository', 'issue', 'projectCards', 'edges'], body))
         })
       })}
-      existingColumns = await graphqlQuery()
+      existingColumns = await graphqlQuery() || []
       existingProjectsColumnId = existingColumns.map((edge) => { // {project1: columnID1, project2: columnId2}
         return {[edge.node.column.project.name]: edge.node.resourcePath.split('-').slice(-1)[0]}
       }).reduce((acc, e) => Object.assign(acc, e), {})
