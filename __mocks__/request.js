@@ -1,5 +1,10 @@
 const request = jest.genMockFromModule('request')
 
-request.post = (req, callback) => { callback(null, {}, {}) }
+var response = {}
+const __setResponse = (fn) => {
+  response = fn()
+}
+request.post = (req, callback) => { callback(null, {}, response) }
+request.__setResponse = __setResponse
 
 module.exports = request

@@ -1,7 +1,7 @@
 # probot-labelboard
 
 > a GitHub App built with [probot](https://github.com/probot/probot) that
-> adds labeled Issues to the specified Project.
+> adds or moves labeled Issues to the specified Projects.
 
 
 ## Setup
@@ -35,7 +35,8 @@ bug:
     help: todo
 ```
 
-That will add issues labeled with 'bug' to the 'todo'
-columns of the 'new tickets' and 'help' repository projects.
+That will add issues labeled with 'bug' to the 'todo' columns of the 'new tickets' and 'help'
+repository projects. Note that the `repo:` keyword is literally `repo:` and not the name of
+the repository. This is to distinguish from Organization Projects, which are not yet supported.
 
 See [docs/deploy.md](docs/deploy.md) if you would like to run your own instance of this app.

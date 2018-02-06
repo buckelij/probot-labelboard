@@ -2,6 +2,7 @@ test('that we can run tests', () => {
   expect(1 + 2 + 3).toBe(6)
 })
 
+jest.mock('request')
 const {createRobot} = require('probot')
 const app = require('probot-labelboard')
 const payload = { 'event': 'issues', 'payload': require('./fixtures/issue.labeled.json') }
@@ -31,13 +32,13 @@ describe('probot-labelboard', () => {
         getProjectColumns: jest.fn().mockReturnValue(Promise.resolve({
           data: [ {'id': 331, 'name': 'todo'}, {'id': 332, 'name': 'done'} ]
         })),
-        createProjectCard: jest.fn().mockReturnValue(Promise.resolve({
-
-        }))
+        createProjectCard: jest.fn().mockReturnValue(Promise.resolve({})),
+        moveProjectCard: jest.fn().mockReturnValue(Promise.resolve({}))
       }
     }
     // Passes the mocked out GitHub API into out robot instance
     robot.auth = () => Promise.resolve(github)
+    require('request').__setResponse(() => { return {} })
   })
 
   describe('fetches from api', () => {
@@ -56,6 +57,21 @@ describe('probot-labelboard', () => {
     it('creates card', async () => {
       await robot.receive(payload)
       expect(github.projects.createProjectCard).toHaveBeenCalled()
+      expect(github.projects.moveProjectCard).not.toHaveBeenCalled()
+    })
+
+    it('moves a card', async () => {
+      // mock graphql response where issues is already in a column
+      const graphqlRes = {
+        data: {repositoryOwner: {repository: {issue: {projectCards:
+        {edges: [{node: {
+          resourcePath: '/buckelij-org/production/projects/1#card-1075',
+          column: {project: {name: 'tickets'}}
+        }}]}}}}}}
+      require('request').__setResponse(() => { return graphqlRes })
+      await robot.receive(payload)
+      expect(github.projects.moveProjectCard).toHaveBeenCalled()
+      expect(github.projects.createProjectCard).not.toHaveBeenCalled()
     })
   })
 })
