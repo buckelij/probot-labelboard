@@ -17,7 +17,7 @@ describe('probot-labelboard', () => {
     app(robot)
 
     github = {
-      auth: {token: "123"},
+      auth: {token: '123'},
       repos: {
         getContent: jest.fn().mockReturnValue(Promise.resolve({
           data: { 'content': Buffer.from('bug:\n  repo:\n    tickets: todo').toString('base64') }

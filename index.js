@@ -45,9 +45,11 @@ module.exports = (robot) => {
       const graphqlReq = {
         uri: 'https://' + (process.env.GHE_HOST || 'api.github.com') + (process.env.GHE_HOST ? '/api/graphql' : '/graphql'),
         method: 'POST',
-        headers: {Authorization: 'Bearer ' + context.github.auth.token,
-                  'content-type': 'application/json',
-                  'user-agent': 'probot-labelboard'},
+        headers: {
+          Authorization: 'Bearer ' + context.github.auth.token,
+          'content-type': 'application/json',
+          'user-agent': 'probot-labelboard'
+        },
         json: {
           query: 'query {' +
             'repositoryOwner(login: "' + context.payload.repository.owner.login + '") {' +
@@ -57,13 +59,19 @@ module.exports = (robot) => {
                         'resourcePath column{ project{name number } resourcePath name }}}}}}}}'
         }
       }
-      const graphqlQuery = () => {return new Promise((resolve) => {
-        graphql.post(graphqlReq, (err, res, body) => {
-          resolve(safeGet(['data', 'repositoryOwner', 'repository', 'issue', 'projectCards', 'edges'], body))
+      const graphqlQuery = () => {
+        return new Promise((resolve) => {
+          graphql.post(graphqlReq, (err, res, body) => {
+            if (err) {
+              resolve([])
+            } else {
+              resolve(safeGet(['data', 'repositoryOwner', 'repository', 'issue', 'projectCards', 'edges'], body))
+            }
+          })
         })
-      })}
-      existingColumns = await graphqlQuery() || []
-      existingProjectsColumnId = existingColumns.map((edge) => { // {project1: columnID1, project2: columnId2}
+      }
+      const existingColumns = await graphqlQuery() || []
+      const existingProjectsColumnId = existingColumns.map((edge) => { // {project1: columnID1, project2: columnId2}
         return {[edge.node.column.project.name]: edge.node.resourcePath.split('-').slice(-1)[0]}
       }).reduce((acc, e) => Object.assign(acc, e), {})
 
@@ -73,11 +81,11 @@ module.exports = (robot) => {
         // for each project, see which column this label should go to
         Object.keys(targetRepoProjects).forEach((project) => {
           const targetColumn = targetRepoProjects[project]
-          if ( Object.keys(existingProjectsColumnId).includes(project) ) {
+          if (Object.keys(existingProjectsColumnId).includes(project)) {
             // attempt moving the card
             context.github.projects.moveProjectCard(
               { id: existingProjectsColumnId[project],
-                position: "top",
+                position: 'top',
                 column_id: repoProjectColumnIds[project][targetColumn]
               })
           } else {
