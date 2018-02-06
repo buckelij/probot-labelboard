@@ -46,14 +46,15 @@ module.exports = (robot) => {
         uri: 'https://' + (process.env.GHE_HOST || 'api.github.com') + (process.env.GHE_HOST ? '/api/graphql' : '/graphql'),
         method: 'POST',
         headers: {Authorization: 'Bearer ' + context.github.auth.token,
-                  'content-type': 'application/json'},
+                  'content-type': 'application/json',
+                  'user-agent': 'probot-labelboard'},
         json: {
           query: 'query {' +
             'repositoryOwner(login: "' + context.payload.repository.owner.login + '") {' +
               'repository(name: "' + context.payload.repository.name + '") {' +
                 'issue(number: ' + context.payload.issue.number + ') {' +
                   'projectCards(first: 30){ edges{ node{' +
-                        'column{ project{name number } resourcePath name }}}}}}}}'
+                        'resourcePath column{ project{name number } resourcePath name }}}}}}}}'
         }
       }
       const graphqlQuery = () => {return new Promise((resolve) => {
@@ -63,7 +64,7 @@ module.exports = (robot) => {
       })}
       existingColumns = await graphqlQuery()
       existingProjectsColumnId = existingColumns.map((edge) => { // {project1: columnID1, project2: columnId2}
-        return {[edge.node.column.project.name]: edge.node.column.resourcePath.split('/').slice(-1)[0]}
+        return {[edge.node.column.project.name]: edge.node.resourcePath.split('-').slice(-1)[0]}
       }).reduce((acc, e) => Object.assign(acc, e), {})
 
       // Find which repo-project-column the tag should be added to
