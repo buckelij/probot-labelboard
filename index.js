@@ -1,6 +1,8 @@
 module.exports = (robot) => {
   robot.on('issues.labeled', async context => {
     // context.log(context) // debug
+    // https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a
+    const safeGet = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
 
     // Load config from .github/myapp.yml in the repository
     // e.g.:
@@ -38,18 +40,53 @@ module.exports = (robot) => {
         }
       }).reduce((acc, e) => Object.assign(acc, e), {})
 
+      // graphql to get cards the issue is in. REST requires iterating over every card.
+      const graphql = require('request')
+      const graphqlReq = {
+        uri: 'https://' + (process.env.GHE_HOST || 'api.github.com') + (process.env.GHE_HOST ? '/api/graphql' : '/graphql'),
+        method: 'POST',
+        headers: {Authorization: 'Bearer ' + context.github.auth.token,
+                  'content-type': 'application/json'},
+        json: {
+          query: 'query {' +
+            'repositoryOwner(login: "' + context.payload.repository.owner.login + '") {' +
+              'repository(name: "' + context.payload.repository.name + '") {' +
+                'issue(number: ' + context.payload.issue.number + ') {' +
+                  'projectCards(first: 30){ edges{ node{' +
+                        'column{ project{name number } resourcePath name }}}}}}}}'
+        }
+      }
+      const graphqlQuery = () => {return new Promise((resolve) => {
+        graphql.post(graphqlReq, (err, res, body) => {
+          resolve(safeGet(['data', 'repositoryOwner', 'repository', 'issue', 'projectCards', 'edges'], body))
+        })
+      })}
+      existingColumns = await graphqlQuery()
+      existingProjectsColumnId = existingColumns.map((edge) => { // {project1: columnID1, project2: columnId2}
+        return {[edge.node.column.project.name]: edge.node.column.resourcePath.split('/').slice(-1)[0]}
+      }).reduce((acc, e) => Object.assign(acc, e), {})
+
       // Find which repo-project-column the tag should be added to
       const targetRepoProjects = config[label]['repo']
       if (targetRepoProjects) {
         // for each project, see which column this label should go to
         Object.keys(targetRepoProjects).forEach((project) => {
           const targetColumn = targetRepoProjects[project]
-          // TODO: list project cards in column to see if it's already there. Handle moves.
-          context.github.projects.createProjectCard(
-            { column_id: repoProjectColumnIds[project][targetColumn],
-              content_id: context.payload.issue.id,
-              content_type: 'Issue'
-            })
+          if ( Object.keys(existingProjectsColumnId).includes(project) ) {
+            // attempt moving the card
+            context.github.projects.moveProjectCard(
+              { id: existingProjectsColumnId[project],
+                position: "top",
+                column_id: repoProjectColumnIds[project][targetColumn]
+              })
+          } else {
+            // create new card
+            context.github.projects.createProjectCard(
+              { column_id: repoProjectColumnIds[project][targetColumn],
+                content_id: context.payload.issue.id,
+                content_type: 'Issue'
+              })
+          }
         })
       }
     } // end if ( labels.includes(label) )
