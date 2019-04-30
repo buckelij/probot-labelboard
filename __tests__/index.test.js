@@ -2,7 +2,6 @@ test('that we can run tests', () => {
   expect(1 + 2 + 3).toBe(6)
 })
 
-jest.mock('request')
 const Probot = require('probot').Probot
 const myProbotApp = require('probot-labelboard')
 const payload = { 'name': 'issues', 'payload': require('./fixtures/issue.labeled.json') }
@@ -19,6 +18,7 @@ describe('probot-labelboard', () => {
 
     github = {
       auth: {token: '123'},
+      query: jest.fn(() => Promise.resolve({})),
       repos: {
         getContents: jest.fn(() => Promise.resolve({
           data: { 'content': Buffer.from('bug:\n  repo:\n    tickets: todo').toString('base64') }
@@ -38,7 +38,6 @@ describe('probot-labelboard', () => {
     }
     // Passes the mocked out GitHub API into out robot instance
     robot.auth = () => Promise.resolve(github)
-    require('request').__setResponse(() => { return {} })
   })
 
   describe('fetches from api', () => {
@@ -68,7 +67,7 @@ describe('probot-labelboard', () => {
           resourcePath: '/buckelij-org/production/projects/1#card-1075',
           column: {project: {name: 'tickets'}}
         }}]}}}}}}
-      require('request').__setResponse(() => { return graphqlRes })
+      github.query = jest.fn(() => Promise.resolve(graphqlRes))
       await robot.receive(payload)
       expect(github.projects.moveCard).toHaveBeenCalled()
       expect(github.projects.createCard).not.toHaveBeenCalled()
