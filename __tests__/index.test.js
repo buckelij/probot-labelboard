@@ -3,9 +3,9 @@ test('that we can run tests', () => {
 })
 
 jest.mock('request')
-const {createRobot} = require('probot')
-const app = require('probot-labelboard')
-const payload = { 'event': 'issues', 'payload': require('./fixtures/issue.labeled.json') }
+const Probot = require('probot').Probot
+const myProbotApp = require('probot-labelboard')
+const payload = { 'name': 'issues', 'payload': require('./fixtures/issue.labeled.json') }
 
 describe('probot-labelboard', () => {
   let robot
@@ -13,27 +13,27 @@ describe('probot-labelboard', () => {
 
   beforeEach(() => {
     // Here we create a robot instance
-    robot = createRobot()
+    let probot = new Probot({})
     // Here we initialize the app on the robot instance
-    app(robot)
+    robot = probot.load(myProbotApp)
 
     github = {
       auth: {token: '123'},
       repos: {
-        getContent: jest.fn().mockReturnValue(Promise.resolve({
+        getContents: jest.fn(() => Promise.resolve({
           data: { 'content': Buffer.from('bug:\n  repo:\n    tickets: todo').toString('base64') }
         }))
       },
       projects: {
-        getRepoProjects: jest.fn().mockReturnValue(Promise.resolve({
+        getRepoProjects: jest.fn(() => Promise.resolve({
           // Whatever the GitHub API should return
           data: [ {'id': 116, 'name': 'tickets'}, {'id': 117, 'name': 'meh'} ]
         })),
-        getProjectColumns: jest.fn().mockReturnValue(Promise.resolve({
+        getProjectColumns: jest.fn(() => Promise.resolve({
           data: [ {'id': 331, 'name': 'todo'}, {'id': 332, 'name': 'done'} ]
         })),
-        createProjectCard: jest.fn().mockReturnValue(Promise.resolve({})),
-        moveProjectCard: jest.fn().mockReturnValue(Promise.resolve({}))
+        createProjectCard: jest.fn(() => Promise.resolve({})),
+        moveProjectCard: jest.fn(() => Promise.resolve({}))
       }
     }
     // Passes the mocked out GitHub API into out robot instance
@@ -44,7 +44,7 @@ describe('probot-labelboard', () => {
   describe('fetches from api', () => {
     it('fetches config', async () => {
       await robot.receive(payload)
-      expect(github.repos.getContent).toHaveBeenCalled()
+      expect(github.repos.getContents).toHaveBeenCalled()
     })
 
     it('fetches projects', async () => {

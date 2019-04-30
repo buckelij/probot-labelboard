@@ -18,8 +18,6 @@ module.exports = (robot) => {
     const labels = Object.keys(config) // labels we care about
     const label = context.payload.label.name
     if (labels.includes(label)) {
-      // debugger; // statements don't work? GHE_HOST=ghe-local.test node debug node_modules/probot/bin/probot-run.js -a...
-
       // get all repo projects from API, because we need the ids
       const repoProjectsRes = await context.github.projects.getRepoProjects(
         { owner: context.payload.repository.owner.login,

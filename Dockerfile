@@ -1,12 +1,9 @@
-FROM node:8
+FROM node:10
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-COPY package.json package-lock.json /usr/src/app/
-RUN npm install
+ENV PATH=$PATH:/app/node_modules/.bin
+WORKDIR /app
+COPY . .
+RUN npm install --production
 
-COPY . /usr/src/app
-RUN npm test
-
-EXPOSE 3000
-CMD [ "npm", "start" ]
+ENTRYPOINT ["probot", "receive"]
+CMD ["/app/index.js"]
