@@ -19,13 +19,13 @@ module.exports = (robot) => {
     const label = context.payload.label.name
     if (labels.includes(label)) {
       // get all repo projects from API, because we need the ids
-      const repoProjectsRes = await context.github.projects.getRepoProjects(
+      const repoProjectsRes = await context.github.projects.listForRepo(
         { owner: context.payload.repository.owner.login,
           repo: context.payload.repository.name })
 
       // get all columns for all projects
       const columnsRes = await Promise.all(repoProjectsRes.data.map((p) => {
-        return context.github.projects.getProjectColumns({project_id: p.id})
+        return context.github.projects.listColumns({project_id: p.id})
       }))
 
       // zip the projects and columns maps together, with project names as keys and {column_name: column_id, ...} as value
@@ -81,14 +81,14 @@ module.exports = (robot) => {
           const targetColumn = targetRepoProjects[project]
           if (Object.keys(existingProjectsColumnId).includes(project)) {
             // attempt moving the card
-            context.github.projects.moveProjectCard(
+            context.github.projects.moveCard(
               { id: existingProjectsColumnId[project],
                 position: 'top',
                 column_id: repoProjectColumnIds[project][targetColumn]
               })
           } else {
             // create new card
-            context.github.projects.createProjectCard(
+            context.github.projects.createCard(
               { column_id: repoProjectColumnIds[project][targetColumn],
                 content_id: context.payload.issue.id,
                 content_type: 'Issue'

@@ -25,15 +25,15 @@ describe('probot-labelboard', () => {
         }))
       },
       projects: {
-        getRepoProjects: jest.fn(() => Promise.resolve({
+        listForRepo: jest.fn(() => Promise.resolve({
           // Whatever the GitHub API should return
           data: [ {'id': 116, 'name': 'tickets'}, {'id': 117, 'name': 'meh'} ]
         })),
-        getProjectColumns: jest.fn(() => Promise.resolve({
+        listColumns: jest.fn(() => Promise.resolve({
           data: [ {'id': 331, 'name': 'todo'}, {'id': 332, 'name': 'done'} ]
         })),
-        createProjectCard: jest.fn(() => Promise.resolve({})),
-        moveProjectCard: jest.fn(() => Promise.resolve({}))
+        createCard: jest.fn(() => Promise.resolve({})),
+        moveCard: jest.fn(() => Promise.resolve({}))
       }
     }
     // Passes the mocked out GitHub API into out robot instance
@@ -49,15 +49,15 @@ describe('probot-labelboard', () => {
 
     it('fetches projects', async () => {
       await robot.receive(payload)
-      expect(github.projects.getRepoProjects).toHaveBeenCalled()
-      expect(github.projects.getProjectColumns).toHaveBeenCalled()
-      expect(github.projects.createProjectCard).toHaveBeenCalled()
+      expect(github.projects.listForRepo).toHaveBeenCalled()
+      expect(github.projects.listColumns).toHaveBeenCalled()
+      expect(github.projects.createCard).toHaveBeenCalled()
     })
 
     it('creates card', async () => {
       await robot.receive(payload)
-      expect(github.projects.createProjectCard).toHaveBeenCalled()
-      expect(github.projects.moveProjectCard).not.toHaveBeenCalled()
+      expect(github.projects.createCard).toHaveBeenCalled()
+      expect(github.projects.moveCard).not.toHaveBeenCalled()
     })
 
     it('moves a card', async () => {
@@ -70,8 +70,8 @@ describe('probot-labelboard', () => {
         }}]}}}}}}
       require('request').__setResponse(() => { return graphqlRes })
       await robot.receive(payload)
-      expect(github.projects.moveProjectCard).toHaveBeenCalled()
-      expect(github.projects.createProjectCard).not.toHaveBeenCalled()
+      expect(github.projects.moveCard).toHaveBeenCalled()
+      expect(github.projects.createCard).not.toHaveBeenCalled()
     })
   })
 })
