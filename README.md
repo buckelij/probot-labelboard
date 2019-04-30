@@ -26,7 +26,7 @@ npm start
 
 Create your `.github/probot-labelboard.yml` and then add to your `.github/main.workflow`:
 
-````
+```
 workflow "add-labelled-to-project" {
   on = "issues"
   resolves = "probot-labelboard"
