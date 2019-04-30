@@ -22,6 +22,22 @@ PRIVATE_KEY="$(cat ~/probot-labelboard.2018-01-01.private-key.pem)"
 npm start
 ```
 
+## Running as an Action
+
+Create your `.github/probot-labelboard.yml` and then add to your `.github/main.workflow`:
+
+````
+workflow "add-labelled-to-project" {
+  on = "issues"
+  resolves = "probot-labelboard"
+}
+
+action "probot-labelboard" {
+  uses = "buckelij/probot-labelboard/@a3d17b4"
+  secrets = ["GITHUB_TOKEN"]
+}
+```
+
 ## .github/probot-labelboard.yml
 
 Configuration is pulled from the .github/probot-labelboard.yml in repositories this App is installed on. 
