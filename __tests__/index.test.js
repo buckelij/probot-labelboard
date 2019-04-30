@@ -18,7 +18,7 @@ describe('probot-labelboard', () => {
 
     github = {
       auth: {token: '123'},
-      query: jest.fn(() => Promise.resolve({})),
+      graphql: jest.fn(() => Promise.resolve({})),
       repos: {
         getContents: jest.fn(() => Promise.resolve({
           data: { 'content': Buffer.from('bug:\n  repo:\n    tickets: todo').toString('base64') }
@@ -67,7 +67,7 @@ describe('probot-labelboard', () => {
           resourcePath: '/buckelij-org/production/projects/1#card-1075',
           column: {project: {name: 'tickets'}}
         }}]}}}}}}
-      github.query = jest.fn(() => Promise.resolve(graphqlRes))
+      github.graphql = jest.fn(() => Promise.resolve(graphqlRes))
       await robot.receive(payload)
       expect(github.projects.moveCard).toHaveBeenCalled()
       expect(github.projects.createCard).not.toHaveBeenCalled()

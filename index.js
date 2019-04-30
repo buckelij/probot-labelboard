@@ -40,18 +40,20 @@ module.exports = (robot) => {
 
       // graphql to get cards the issue is in. REST requires iterating over every card.
       const existingColumnsQuery = `
-        query repositoryOwner($login: String!) {
-          repository($name: String!) {
-            issue(number: Int!) {
-              projectsCards(first: 30) {
-                edges { node {
-                  resourcePath
-                  column {
-                    project { name number }
+        query existingColumnsQuery($login: String!, $name: String!, $number: Int!){
+          repositoryOwner(login:$login) {
+            repository(name:$name) {
+              issue(number:$number) {
+                projectCards(first: 30) {
+                  edges { node {
                     resourcePath
-                    name
-                  }
-                }}
+                    column {
+                      project { name number }
+                      resourcePath
+                      name
+                    }
+                  }}
+                }
               }
             }
           }
@@ -59,7 +61,7 @@ module.exports = (robot) => {
       `
 
       const existingColumnsRes = safeGet(['data', 'repositoryOwner', 'repository', 'issue', 'projectCards', 'edges'],
-        await context.github.query(existingColumnsQuery, {
+        await context.github.graphql(existingColumnsQuery, {
           login: context.payload.repository.owner.login,
           name: context.payload.repository.name,
           number: context.payload.issue.number
