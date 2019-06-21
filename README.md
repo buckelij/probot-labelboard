@@ -4,7 +4,7 @@
 > adds or moves labeled Issues to the specified Projects.
 
 
-## Setup
+## Setup and running as a traditional service
 
 ```
 # Install dependencies
@@ -21,6 +21,15 @@ PRIVATE_KEY="$(cat ~/probot-labelboard.2018-01-01.private-key.pem)"
 # Run the bot
 npm start
 ```
+
+See also see the [docs for deployment](https://probot.github.io/docs/deployment/).
+
+This app requires these **Permissions & events** for the GitHub App:
+
+* Single file *Read-only* to `.github/probot-labelboard.yml`
+* Issues *Read-only*
+* Repository projects *Read & write*
+* Subscribe to events: Issues
 
 ## Running as an Action
 
