@@ -33,23 +33,27 @@ This app requires these **Permissions & events** for the GitHub App:
 
 ## Running as an Action
 
-Create your `.github/probot-labelboard.yml` and then add to your `.github/main.workflow`:
+Create your `.github/probot-labelboard.yml` and then create `.github/workflows/probot-labelboard.yml` (set the "uses" SHA to the current master SHA):
 
 ```
-workflow "add-labelled-to-project" {
-  on = "issues"
-  resolves = "probot-labelboard"
-}
+name: probot-labelboard
 
-action "probot-labelboard" {
-  uses = "buckelij/probot-labelboard/@a3d17b4"
-  secrets = ["GITHUB_TOKEN"]
-}
+on:
+  issues:
+    types: [labeled, unlabeled]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: buckelij/probot-labelboard@294e2cf
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## .github/probot-labelboard.yml
 
-Configuration is pulled from the .github/probot-labelboard.yml in repositories this App is installed on. 
+Configuration is pulled from the .github/probot-labelboard.yml in repositories this App is installed on.
 
 Example configuration:
 
