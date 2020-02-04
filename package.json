@@ -1,11 +1,14 @@
 {
   "name": "@buckelij/probot-labelboard",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "author": "Elijah Buck <elijah.buck@gmail.com>",
   "license": "ISC",
   "repository": "https://github.com/buckelij/probot-labelboard.git",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "main": "index.js",
   "scripts": {
     "start": "probot run ./index.js",
     "test": "jest && standard"

@@ -1,6 +1,6 @@
 {
-  "name": "probot-labelboard",
-  "version": "1.1.0",
+  "name": "@buckelij/probot-labelboard",
+  "version": "1.1.1",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -3719,13 +3719,14 @@
       "resolved": "https://registry.npmjs.org/hbs/-/hbs-4.0.6.tgz",
       "integrity": "sha512-KFt3Y4zOvVQOp84TmqVaFTpBTYO1sVenBoBY712MI3vPkKxVoO6AsuEyDayIRPRAHRYZHHWnmc4spFa8fhQpLw==",
       "requires": {
+        "handlebars": "4.3.5",
         "walk": "2.3.14"
       },
       "dependencies": {
         "handlebars": {
-          "version": "4.5.3",
-          "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-4.5.3.tgz",
-          "integrity": "sha512-3yPecJoJHK/4c6aZhSvxOyG4vJKDshV36VHp0iVCDVh7o9w2vwi3NSnL2MMPj3YdduqaBcu7cGbggJQM0br9xA==",
+          "version": "4.3.5",
+          "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-4.3.5.tgz",
+          "integrity": "sha512-I16T/l8X9DV3sEkY9sK9lsPRgDsj82ayBY/4pAZyP2BcX5WeRM3O06bw9kIs2GLrHvFB/DNzWWJyFvof8wQGqw==",
           "requires": {
             "neo-async": "^2.6.0",
             "optimist": "^0.6.1",

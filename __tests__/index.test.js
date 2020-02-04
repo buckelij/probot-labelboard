@@ -3,7 +3,7 @@ test('that we can run tests', () => {
 })
 
 const Probot = require('probot').Probot
-const myProbotApp = require('probot-labelboard')
+const myProbotApp = require('../index.js')
 const payload = { 'name': 'issues', 'payload': require('./fixtures/issue.labeled.json') }
 
 describe('probot-labelboard', () => {
