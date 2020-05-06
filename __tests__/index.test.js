@@ -4,7 +4,7 @@ test('that we can run tests', () => {
 
 const Probot = require('probot').Probot
 const myProbotApp = require('../index.js')
-const payload = { 'name': 'issues', 'payload': require('./fixtures/issue.labeled.json') }
+const payload = { name: 'issues', payload: require('./fixtures/issue.labeled.json') }
 
 describe('probot-labelboard', () => {
   let robot
@@ -12,25 +12,25 @@ describe('probot-labelboard', () => {
 
   beforeEach(() => {
     // Here we create a robot instance
-    let probot = new Probot({})
+    const probot = new Probot({})
     // Here we initialize the app on the robot instance
     robot = probot.load(myProbotApp)
 
     github = {
-      auth: {token: '123'},
+      auth: { token: '123' },
       graphql: jest.fn(() => Promise.resolve({})),
       repos: {
         getContents: jest.fn(() => Promise.resolve({
-          data: { 'content': Buffer.from('bug:\n  repo:\n    tickets: todo').toString('base64') }
+          data: { content: Buffer.from('bug:\n  repo:\n    tickets: todo').toString('base64') }
         }))
       },
       projects: {
         listForRepo: jest.fn(() => Promise.resolve({
           // Whatever the GitHub API should return
-          data: [ {'id': 116, 'name': 'tickets'}, {'id': 117, 'name': 'meh'} ]
+          data: [{ id: 116, name: 'tickets' }, { id: 117, name: 'meh' }]
         })),
         listColumns: jest.fn(() => Promise.resolve({
-          data: [ {'id': 331, 'name': 'todo'}, {'id': 332, 'name': 'done'} ]
+          data: [{ id: 331, name: 'todo' }, { id: 332, name: 'done' }]
         })),
         createCard: jest.fn(() => Promise.resolve({})),
         moveCard: jest.fn(() => Promise.resolve({}))
@@ -62,11 +62,24 @@ describe('probot-labelboard', () => {
     it('moves a card', async () => {
       // mock graphql response where issues is already in a column
       const graphqlRes = {
-        data: {repositoryOwner: {repository: {issue: {projectCards:
-        {edges: [{node: {
-          resourcePath: '/buckelij-org/production/projects/1#card-1075',
-          column: {project: {name: 'tickets'}}
-        }}]}}}}}}
+        data: {
+          repositoryOwner: {
+            repository: {
+              issue: {
+                projectCards:
+        {
+          edges: [{
+            node: {
+              resourcePath: '/buckelij-org/production/projects/1#card-1075',
+              column: { project: { name: 'tickets' } }
+            }
+          }]
+        }
+              }
+            }
+          }
+        }
+      }
       github.graphql = jest.fn(() => Promise.resolve(graphqlRes))
       await robot.receive(payload)
       expect(github.projects.moveCard).toHaveBeenCalled()

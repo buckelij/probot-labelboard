@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:12
 
 ENV PATH=$PATH:/app/node_modules/.bin
 WORKDIR /app
