@@ -20,20 +20,22 @@ module.exports = (robot) => {
     if (labels.includes(label)) {
       // get all repo projects from API, because we need the ids
       const repoProjectsRes = await context.github.projects.listForRepo(
-        { owner: context.payload.repository.owner.login,
-          repo: context.payload.repository.name })
+        {
+          owner: context.payload.repository.owner.login,
+          repo: context.payload.repository.name
+        })
 
       // get all columns for all projects
       const columnsRes = await Promise.all(repoProjectsRes.data.map((p) => {
-        return context.github.projects.listColumns({project_id: p.id})
+        return context.github.projects.listColumns({ project_id: p.id })
       }))
 
       // zip the projects and columns maps together, with project names as keys and {column_name: column_id, ...} as value
       // e.g. {"tickets":{"todo":331,"done":332},"meh":{"shrug":333}}
       const repoProjectColumnIds = repoProjectsRes.data.map((e, i) => {
         return {
-          [e.name]: columnsRes[i]['data'].map((c) => {
-            return {[c.name]: c.id}
+          [e.name]: columnsRes[i].data.map((c) => {
+            return { [c.name]: c.id }
           }).reduce((acc, e) => Object.assign(acc, e), {})
         }
       }).reduce((acc, e) => Object.assign(acc, e), {})
@@ -69,11 +71,11 @@ module.exports = (robot) => {
 
       const existingColumns = await existingColumnsRes || []
       const existingProjectsColumnId = existingColumns.map((edge) => { // {project1: columnID1, project2: columnId2}
-        return {[edge.node.column.project.name]: edge.node.resourcePath.split('-').slice(-1)[0]}
+        return { [edge.node.column.project.name]: edge.node.resourcePath.split('-').slice(-1)[0] }
       }).reduce((acc, e) => Object.assign(acc, e), {})
 
       // Find which repo-project-column the tag should be added to
-      const targetRepoProjects = config[label]['repo']
+      const targetRepoProjects = config[label].repo
       if (targetRepoProjects) {
         // for each project, see which column this label should go to
         Object.keys(targetRepoProjects).forEach((project) => {
@@ -81,14 +83,16 @@ module.exports = (robot) => {
           if (Object.keys(existingProjectsColumnId).includes(project)) {
             // attempt moving the card
             context.github.projects.moveCard(
-              { id: existingProjectsColumnId[project],
+              {
+                id: existingProjectsColumnId[project],
                 position: 'top',
                 column_id: repoProjectColumnIds[project][targetColumn]
               })
           } else {
             // create new card
             context.github.projects.createCard(
-              { column_id: repoProjectColumnIds[project][targetColumn],
+              {
+                column_id: repoProjectColumnIds[project][targetColumn],
                 content_id: context.payload.issue.id,
                 content_type: 'Issue'
               })
