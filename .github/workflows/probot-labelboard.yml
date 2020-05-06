@@ -1,0 +1,13 @@
+name: probot-labelboard
+
+on:
+  issues:
+    types: [labeled, unlabeled]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: buckelij/probot-labelboard@08eab7b
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
