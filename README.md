@@ -33,7 +33,7 @@ This app requires these **Permissions & events** for the GitHub App:
 
 ## Running as an Action
 
-Create your `.github/probot-labelboard.yml` and then create `.github/workflows/probot-labelboard.yml` (set the "uses" SHA to the current master SHA):
+Create your `.github/probot-labelboard.yml` and then create `.github/workflows/probot-labelboard.yml` (set the "uses" SHA to the current base SHA):
 
 ```
 name: probot-labelboard
